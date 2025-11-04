@@ -737,19 +737,9 @@
             <!-- Coded by @bharath_boy || it's requested not to remove the credit -->
             <section id="video-section" class="video-section">
                 <div class="video-container glass">
-                    <!-- <video id="player">
+                    <video id="player">
                         <source src="{{file_url}}" type="video/mp4" />
-                    </video> -->
-
-
-
-
-<video id="player" playsinline controls>
-    <!-- MODIFIED: The source now points to our new streaming endpoint -->
-    <source src="/stream/{{secure_hash}}{{file_id}}/master.m3u8" type="application/x-mpegURL" />
-</video>
-
-
+                    </video>
                     <div class="skip-overlay rewind">
                         <i class="fas fa-backward"></i>
                         <span>10s</span>
