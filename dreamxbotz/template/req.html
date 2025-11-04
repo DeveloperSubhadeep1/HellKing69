@@ -249,6 +249,32 @@
             object-fit: cover;
             display: block;
         }
+        
+        /* NEW: Styles for the dual-tap-to-skip overlay */
+        .skip-overlay {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 25; /* Above Plyr UI */
+        }
+        .skip-overlay.rewind { left: 0; }
+        .skip-overlay.forward { right: 0; }
+        .skip-overlay.show { opacity: 1; }
+        .skip-overlay i { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        /* END NEW */
+
 
         /* This CSS was crafted by @bharath_boy || credit removal is not permitted */
         .info-panel {
@@ -751,6 +777,16 @@
                     <video id="player">
                         <source src="{{file_url}}" type="video/mp4" />
                     </video>
+                    <!-- NEW: HTML for skip indicators -->
+                    <div class="skip-overlay rewind">
+                        <i class="fas fa-backward"></i>
+                        <span>10s</span>
+                    </div>
+                    <div class="skip-overlay forward">
+                        <i class="fas fa-forward"></i>
+                        <span>10s</span>
+                    </div>
+                    <!-- END NEW -->
                 </div>
 
                 <div class="info-panel glass">
@@ -858,6 +894,7 @@
         // Global variables
         let particles = [];
         let mouse = { x: 0, y: 0 };
+        let player; // NEW: Make player instance globally accessible
 
         document.addEventListener('DOMContentLoaded', () => {
             initializePlayer();
@@ -868,13 +905,74 @@
             startTypewriter();
             initializeSizeControl();
             initializeDropdown();
+            initializeDoubleTapSkip(); // NEW: Initialize the double tap feature
         });
 
         function initializePlayer() {
-            const player = new Plyr('#player', {
-                controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'captions', 'pip', 'airplay', 'fullscreen']
+            // NEW: Assign to the global player variable and disable default clickToPlay
+            player = new Plyr('#player', {
+                controls: ['play-large', 'rewind', 'play', 'fast-forward', 'progress', 'current-time', 'mute', 'volume', 'settings', 'captions', 'pip', 'airplay', 'fullscreen'],
+                clickToPlay: false, // This is crucial for our custom handler
             });
         }
+        
+        // NEW: Function to handle dual-tap-to-skip functionality
+        function initializeDoubleTapSkip() {
+            const videoWrapper = document.querySelector('.plyr__video-wrapper');
+            const rewindOverlay = document.querySelector('.skip-overlay.rewind');
+            const forwardOverlay = document.querySelector('.skip-overlay.forward');
+            
+            if (!videoWrapper) return;
+
+            let lastTap = 0;
+            let tapTimeout = null;
+            const tapDelay = 300; // ms
+
+            videoWrapper.addEventListener('click', (e) => {
+                const currentTime = new Date().getTime();
+                const tapLength = currentTime - lastTap;
+                
+                // Clear any pending single-tap action
+                clearTimeout(tapTimeout);
+
+                if (tapLength < tapDelay && tapLength > 0) {
+                    // This is a double tap
+                    e.preventDefault(); // Prevent any default behavior
+
+                    const rect = videoWrapper.getBoundingClientRect();
+                    const midpoint = rect.left + rect.width / 2;
+                    
+                    if (e.clientX < midpoint) {
+                        // Left side tap (rewind)
+                        player.rewind(10);
+                        showSkipOverlay(rewindOverlay);
+                    } else {
+                        // Right side tap (forward)
+                        player.forward(10);
+                        showSkipOverlay(forwardOverlay);
+                    }
+                    
+                    // Reset lastTap to prevent a third click from being a double tap
+                    lastTap = 0;
+                } else {
+                    // This is a single tap, set a timeout to handle play/pause
+                    tapTimeout = setTimeout(() => {
+                        player.togglePlay();
+                    }, tapDelay);
+                    
+                    // Update lastTap to the current time for the next potential tap
+                    lastTap = currentTime;
+                }
+            });
+
+            function showSkipOverlay(overlay) {
+                overlay.classList.add('show');
+                setTimeout(() => {
+                    overlay.classList.remove('show');
+                }, 600); // Overlay visible for 600ms
+            }
+        }
+        // END NEW
 
         // The following script is by @bharath_boy || kindly keep this credit.
         // Advanced particle system
