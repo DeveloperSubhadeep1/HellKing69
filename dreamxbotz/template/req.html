@@ -207,12 +207,10 @@
             position: relative;
             z-index: 10;
             padding-top: 6rem;
-            max-width: 1400px;
-            /* Default max-width */
+            max-width: 1400px; /* Default max-width */
             margin: 0 auto;
             padding-left: 2rem;
             padding-right: 2rem;
-            transition: max-width 0.5s ease-in-out;
         }
 
         .video-section {
@@ -312,12 +310,10 @@
         }
 
         .file-info {
-            /* Add this to allow the flex item to shrink below its content size */
             min-width: 0;
         }
 
         .file-name {
-            /* Add this to allow the long file name to wrap */
             word-break: break-word;
             font-family: 'Orbitron', monospace;
             font-size: 2rem;
@@ -351,45 +347,7 @@
             flex-wrap: wrap;
         }
 
-        .size-control {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background: var(--dark-accent);
-            padding: 0.5rem 1rem;
-            border-radius: 2rem;
-            border: 1px solid var(--glass-border);
-        }
-
-        .size-control i {
-            color: var(--text-secondary);
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 120px;
-            height: 4px;
-            background: var(--dark-bg);
-            border-radius: 2px;
-            outline: none;
-            cursor: pointer;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--primary-cyan);
-            border-radius: 50%;
-            border: 2px solid var(--dark-bg);
-            transition: background 0.3s ease;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: var(--primary-purple);
-        }
+        /* REMOVED: .size-control and input[type="range"] styles were here */
 
         /* Code by @bharath_boy || we request you keep the credit */
         .action-buttons {
@@ -678,34 +636,23 @@
                 padding-right: 1rem;
             }
             
-            /* --- MODIFIED/NEW RULES FOR MOBILE --- */
-            
-            /* Make video section stretch to screen edges */
             .video-section {
                 margin-left: -1rem;
                 margin-right: -1rem;
             }
 
-            /* Remove border radius from full-width video container */
             .video-container {
                 border-radius: 0;
-                margin-bottom: 0; /* Remove gap between video and info panel */
-            }
-            
-            /* Hide the player size control on mobile */
-            .size-control {
-                display: none;
+                margin-bottom: 0;
             }
             
             .info-panel {
                 flex-direction: column;
                 text-align: center;
                 gap: 1.5rem;
-                border-radius: 0; /* Remove border radius */
-                padding: 2rem 1rem; /* Adjust padding for content */
+                border-radius: 0;
+                padding: 2rem 1rem;
             }
-
-            /* --- END OF MODIFIED/NEW RULES --- */
 
             .panel-actions {
                 width: 100%;
@@ -815,10 +762,7 @@
                     </div>
 
                     <div class="panel-actions">
-                        <div class="size-control" title="Adjust Player Size">
-                            <i class="fas fa-arrows-alt-h"></i>
-                            <input type="range" id="size-slider" min="70" max="95" value="70" step="1">
-                        </div>
+                        <!-- REMOVED: Size control slider div was here -->
                         <div class="action-buttons">
                             <button class="action-btn" onclick="blazeDownload()">
                                 <i class="fas fa-download"></i>
@@ -913,7 +857,7 @@
         // Global variables
         let particles = [];
         let mouse = { x: 0, y: 0 };
-        let player; // Make player instance globally accessible
+        let player;
 
         document.addEventListener('DOMContentLoaded', () => {
             initializePlayer();
@@ -922,9 +866,9 @@
             initializeScrollAnimations();
             initializeCursor();
             startTypewriter();
-            initializeSizeControl();
             initializeDropdown();
             initializeDoubleTapSkip();
+            // REMOVED: initializeSizeControl() call was here
         });
 
         function initializePlayer() {
@@ -981,7 +925,6 @@
         }
 
         // The following script is by @bharath_boy || kindly keep this credit.
-        // Advanced particle system
         function initializeParticles() {
             const canvas = document.getElementById('particle-canvas');
             const ctx = canvas.getContext('2d');
@@ -1054,7 +997,6 @@
             animateParticles();
         }
 
-        // Author: @bharath_boy || credit removal is not allowed.
         function initializeAnimations() {
             document.querySelectorAll('.info-card').forEach(card => {
                 card.addEventListener('mousemove', (e) => {
@@ -1122,7 +1064,7 @@
                 observer.observe(el);
             });
         }
-        // This function was coded by @bharath_boy || don't remove the credit line.
+
         function initializeCursor() {
             const cursor = document.querySelector('.cursor-dot');
 
@@ -1183,7 +1125,7 @@
                 menuBtn.className = 'fas fa-bars';
             }
         }
-        // @bharath_boy wrote this script || please maintain the credit.
+
         function closeMobileMenu() {
             document.getElementById('mobile-nav').classList.remove('active');
             document.querySelector('.mobile-menu-btn i').className = 'fas fa-bars';
@@ -1271,22 +1213,7 @@
             });
         });
 
-        function initializeSizeControl() {
-            const sizeSlider = document.getElementById('size-slider');
-            const mainContainer = document.querySelector('.main-container');
-
-            if (window.matchMedia('(max-width: 768px)').matches) {
-                return; // Don't initialize if on mobile
-            }
-
-            const defaultWidth = sizeSlider.value;
-            mainContainer.style.maxWidth = defaultWidth >= 95 ? '1400px' : `${defaultWidth}vw`;
-
-            sizeSlider.addEventListener('input', (e) => {
-                const newWidth = e.target.value;
-                mainContainer.style.maxWidth = newWidth >= 95 ? '1400px' : `${newWidth}vw`;
-            });
-        }
+        // REMOVED: The initializeSizeControl function was here
 
         function toggleMorePlayers() {
             const dropdown = document.getElementById('more-players-dropdown');
@@ -1320,7 +1247,7 @@
         };
         const videoUrl = getCurrentUrl();
         const e = videoUrl;
-        // Credit for this JavaScript goes to @bharath_boy || please do not remove.
+
         function vlc_player() { const x = e.replace(/^https?:\/\//, ""); window.location.href = `vlc://${x}`; event.preventDefault(); }
         function mx_player() { window.location.href = `intent:${e}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.mxtech.videoplayer.ad;end`; event.preventDefault(); }
         function mx_playerpro() { window.location.href = `intent:${e}#Intent;action=android.intent.action.VIEW;type=video/*;package=com.mxtech.videoplayer.pro;end`; event.preventDefault(); }
