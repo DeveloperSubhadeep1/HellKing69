@@ -605,17 +605,7 @@
             background-clip: text;
         }
 
-        .cursor-dot {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: radial-gradient(circle, var(--primary-cyan), transparent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 9999;
-            mix-blend-mode: screen;
-            transition: all 0.1s ease;
-        }
+        /* REMOVED: .cursor-dot style block was here */
 
         @media (max-width: 768px) {
             .nav {
@@ -676,7 +666,7 @@
             }
 
             /* --- Simplify Plyr controls on mobile --- */
-            .plyr--video .plyr__control[data-plyr="rewind"], /* MODIFIED: Added rewind to the list */
+            .plyr--video .plyr__control[data-plyr="rewind"],
             .plyr--video .plyr__control[data-plyr="fast-forward"],
             .plyr--video .plyr__control[data-plyr="pip"],
             .plyr--video .plyr__control[data-plyr="airplay"],
@@ -718,7 +708,7 @@
     <!-- The author of this code is @bharath_boy || please keep the credit -->
     <canvas id="particle-canvas"></canvas>
     <div class="gradient-overlay"></div>
-    <div class="cursor-dot"></div>
+    <!-- REMOVED: <div class="cursor-dot"></div> was here -->
 
     <header class="header">
         <div class="header-content">
@@ -866,7 +856,7 @@
             initializeParticles();
             initializeAnimations();
             initializeScrollAnimations();
-            initializeCursor();
+            // REMOVED: initializeCursor();
             startTypewriter();
             initializeDropdown();
             initializeDoubleTapSkip();
@@ -1037,19 +1027,7 @@
             });
         }
         
-        function initializeCursor() {
-            const cursor = document.querySelector('.cursor-dot');
-            document.addEventListener('mousemove', (e) => {
-                mouse.x = e.clientX;
-                mouse.y = e.clientY;
-                gsap.to(cursor, {
-                    x: e.clientX - 4, y: e.clientY - 4,
-                    duration: 0.1, ease: 'power2.out'
-                });
-            });
-            document.addEventListener('mouseleave', () => { cursor.style.opacity = '0'; });
-            document.addEventListener('mouseenter', () => { cursor.style.opacity = '1'; });
-        }
+        // REMOVED: initializeCursor function was here
 
         function startTypewriter() {
             const target = document.getElementById('typewriter-target');
