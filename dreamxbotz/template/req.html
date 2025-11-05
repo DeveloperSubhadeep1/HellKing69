@@ -872,11 +872,6 @@
             
             if (!videoWrapper) return;
 
-            // NEW CODE: This listener prevents the default double-click action (fullscreen)
-            videoWrapper.addEventListener('dblclick', (e) => {
-                e.preventDefault();
-            });
-
             let lastTap = 0;
             let tapTimeout = null;
             const tapDelay = 300; 
@@ -888,8 +883,10 @@
                 clearTimeout(tapTimeout);
 
                 if (tapLength < tapDelay && tapLength > 0) {
-                    // This is a double tap, our logic runs
-                    e.preventDefault(); 
+                    // This is a double tap
+                    e.preventDefault();
+                    e.stopPropagation(); // <-- THE CRITICAL FIX: Stop the event from bubbling up
+
                     const rect = videoWrapper.getBoundingClientRect();
                     const midpoint = rect.left + rect.width / 2;
                     
@@ -900,7 +897,7 @@
                         player.forward(10);
                         showSkipOverlay(forwardOverlay);
                     }
-                    lastTap = 0;
+                    lastTap = 0; // Reset tap timer
                 } else {
                     // This is a single tap
                     tapTimeout = setTimeout(() => {
