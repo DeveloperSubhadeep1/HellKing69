@@ -46,7 +46,6 @@
             min-height: 100vh;
         }
 
-        /* The following styles were written by @bharath_boy || do not remove credit */
         #particle-canvas {
             position: fixed;
             top: 0;
@@ -75,7 +74,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
 
-        /* Code credit: @bharath_boy || this line should not be removed */
         .header {
             position: fixed;
             top: 0;
@@ -188,7 +186,6 @@
             display: block;
         }
 
-        /* Authored by @bharath_boy || please leave this credit intact */
         .mobile-nav a {
             display: block;
             padding: 1rem;
@@ -271,8 +268,6 @@
         .skip-overlay.show { opacity: 1; }
         .skip-overlay i { font-size: 2.5rem; margin-bottom: 0.5rem; }
 
-
-        /* This CSS was crafted by @bharath_boy || credit removal is not permitted */
         .info-panel {
             border-radius: 1.5rem;
             padding: 2rem;
@@ -865,6 +860,7 @@
             });
         }
         
+        // --- MODIFIED & ROBUST Double Tap Logic ---
         function initializeDoubleTapSkip() {
             const videoWrapper = document.querySelector('.plyr__video-wrapper');
             const rewindOverlay = document.querySelector('.skip-overlay.rewind');
@@ -876,28 +872,28 @@
             let tapTimeout = null;
             const tapDelay = 300; 
 
-            videoWrapper.addEventListener('click', (e) => {
+            // Function to handle the tap logic
+            const handleTap = (e, clientX) => {
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTap;
-                
                 clearTimeout(tapTimeout);
 
                 if (tapLength < tapDelay && tapLength > 0) {
                     // This is a double tap
-                    e.preventDefault();
-                    e.stopPropagation(); // <-- THE CRITICAL FIX: Stop the event from bubbling up
+                    e.preventDefault(); // Critical to prevent unwanted actions
+                    e.stopPropagation(); // Stop the event completely
 
                     const rect = videoWrapper.getBoundingClientRect();
                     const midpoint = rect.left + rect.width / 2;
                     
-                    if (e.clientX < midpoint) {
+                    if (clientX < midpoint) {
                         player.rewind(10);
                         showSkipOverlay(rewindOverlay);
                     } else {
                         player.forward(10);
                         showSkipOverlay(forwardOverlay);
                     }
-                    lastTap = 0; // Reset tap timer
+                    lastTap = 0;
                 } else {
                     // This is a single tap
                     tapTimeout = setTimeout(() => {
@@ -905,6 +901,18 @@
                     }, tapDelay);
                     lastTap = currentTime;
                 }
+            };
+
+            // Listener for MOUSE clicks (Desktop)
+            videoWrapper.addEventListener('click', (e) => {
+                handleTap(e, e.clientX);
+            });
+
+            // Listener for TOUCH events (Mobile)
+            videoWrapper.addEventListener('touchend', (e) => {
+                // Prevent the browser from firing a "ghost" click event 300ms later
+                e.preventDefault();
+                handleTap(e, e.changedTouches[0].clientX);
             });
 
             function showSkipOverlay(overlay) {
