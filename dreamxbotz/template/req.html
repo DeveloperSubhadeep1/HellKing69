@@ -605,8 +605,6 @@
             background-clip: text;
         }
 
-        /* REMOVED: .cursor-dot style block was here */
-
         @media (max-width: 768px) {
             .nav {
                 display: none;
@@ -708,7 +706,6 @@
     <!-- The author of this code is @bharath_boy || please keep the credit -->
     <canvas id="particle-canvas"></canvas>
     <div class="gradient-overlay"></div>
-    <!-- REMOVED: <div class="cursor-dot"></div> was here -->
 
     <header class="header">
         <div class="header-content">
@@ -856,7 +853,6 @@
             initializeParticles();
             initializeAnimations();
             initializeScrollAnimations();
-            // REMOVED: initializeCursor();
             startTypewriter();
             initializeDropdown();
             initializeDoubleTapSkip();
@@ -876,6 +872,11 @@
             
             if (!videoWrapper) return;
 
+            // NEW CODE: This listener prevents the default double-click action (fullscreen)
+            videoWrapper.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+            });
+
             let lastTap = 0;
             let tapTimeout = null;
             const tapDelay = 300; 
@@ -887,6 +888,7 @@
                 clearTimeout(tapTimeout);
 
                 if (tapLength < tapDelay && tapLength > 0) {
+                    // This is a double tap, our logic runs
                     e.preventDefault(); 
                     const rect = videoWrapper.getBoundingClientRect();
                     const midpoint = rect.left + rect.width / 2;
@@ -900,6 +902,7 @@
                     }
                     lastTap = 0;
                 } else {
+                    // This is a single tap
                     tapTimeout = setTimeout(() => {
                         player.togglePlay();
                     }, tapDelay);
@@ -1027,8 +1030,6 @@
             });
         }
         
-        // REMOVED: initializeCursor function was here
-
         function startTypewriter() {
             const target = document.getElementById('typewriter-target');
             const text = '{{file_name}}';
