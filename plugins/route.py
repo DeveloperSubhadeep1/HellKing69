@@ -327,7 +327,6 @@
 
 
 
-
 from aiohttp import web
 import re
 import math
@@ -344,11 +343,12 @@ from dreamxbotz.util.custom_dl import ByteStreamer
 from dreamxbotz.util.render_template import render_page
 from info import *
 
-# --- NEW IMPORTS FOR WEB SEARCH ---
+# --- IMPORTS FOR WEB PAGES ---
 from Script import script
-from utils import temp, format_bytes # Re-using the helper from utils
+# We will import from utils inside functions to prevent circular imports
 from database.ia_filterdb import get_search_results
 from database.config_db import mdb
+
 
 routes = web.RouteTableDef()
 
@@ -357,6 +357,9 @@ routes = web.RouteTableDef()
 
 def get_page_template(title, content):
     """Generates a generic HTML page for Help, About, etc."""
+    # Local import to break circular dependency
+    from utils import temp
+    
     return f"""
     <!DOCTYPE html>
     <html lang="en">
@@ -454,6 +457,9 @@ async def root_route_handler(request: web.Request):
     """
     Serves the main start page with an integrated search bar and results display.
     """
+    # Local imports to break circular dependency
+    from utils import temp, get_size
+
     query = request.rel_url.query.get("query", "").strip()
     search_results_html = ""
 
@@ -470,7 +476,7 @@ async def root_route_handler(request: web.Request):
                 
                 watch_url = f"/watch/{file_hash}{file_id}"
                 download_url = f"/{file_hash}{file_id}"
-                file_size_formatted = format_bytes(file.file_size)
+                file_size_formatted = get_size(file.file_size) # Use get_size from utils
 
                 search_results_html += f"""
                 <li>
@@ -490,7 +496,6 @@ async def root_route_handler(request: web.Request):
 
     # HTML structure for the entire page
     bot_name = temp.B_NAME
-    add_me_url = f'http://t.me/{temp.U_NAME}?startgroup=true'
     background_image = random.choice(PICS)
 
     html_content = f"""
@@ -643,6 +648,8 @@ async def help_page_handler(request):
 @routes.get("/about", allow_head=True)
 async def about_page_handler(request):
     """Serves the about page."""
+    # Local import to break circular dependency
+    from utils import temp
     about_content = script.ABOUT_TXT.format(
         U_NAME=temp.U_NAME,
         B_NAME=temp.B_NAME,
@@ -688,7 +695,7 @@ async def top_searches_handler(request):
 async def watch_page_handler(request: web.Request):
     try:
         path = request.match_info["path"]
-        match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)", path)
+        match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
         if match:
             secure_hash = match.group(1)
             id = int(match.group(2))
@@ -710,6 +717,8 @@ async def watch_page_handler(request: web.Request):
 
 @routes.get(r"/download/{path:\S+}", allow_head=True)
 async def download_page_handler(request: web.Request):
+    # Local import to break circular dependency
+    from utils import get_size
     try:
         path = request.match_info["path"]
         match = re.search(r"^([a-zA-Z0-9_-]{6})(\d+)$", path)
@@ -729,7 +738,7 @@ async def download_page_handler(request: web.Request):
 
         file_name = file_id.file_name
         file_size_bytes = file_id.file_size
-        file_size_formatted = format_bytes(file_size_bytes)
+        file_size_formatted = get_size(file_size_bytes)
         file_type = file_name.split('.')[-1].upper() if '.' in file_name else "File"
         actual_download_url = f"/{secure_hash}{id}"
 
@@ -854,6 +863,3 @@ async def media_streamer(request: web.Request, id: int, secure_hash: str):
             "Accept-Ranges": "bytes",
         },
     )
-
-
-
