@@ -325,8 +325,6 @@
 
 
 
-
-
 from aiohttp import web
 import re
 import math
@@ -345,8 +343,7 @@ from info import *
 
 # --- IMPORTS FOR WEB PAGES ---
 from Script import script
-# We will import from utils inside functions to prevent circular imports
-from database.ia_filterdb import get_search_results
+# We will import from utils and ia_filterdb inside functions to prevent circular imports
 from database.config_db import mdb
 
 
@@ -459,6 +456,7 @@ async def root_route_handler(request: web.Request):
     """
     # Local imports to break circular dependency
     from utils import temp, get_size
+    from database.ia_filterdb import get_search_results # MOVED THIS IMPORT HERE
 
     query = request.rel_url.query.get("query", "").strip()
     search_results_html = ""
@@ -476,7 +474,7 @@ async def root_route_handler(request: web.Request):
                 
                 watch_url = f"/watch/{file_hash}{file_id}"
                 download_url = f"/{file_hash}{file_id}"
-                file_size_formatted = get_size(file.file_size) # Use get_size from utils
+                file_size_formatted = get_size(file.file_size)
 
                 search_results_html += f"""
                 <li>
@@ -648,7 +646,6 @@ async def help_page_handler(request):
 @routes.get("/about", allow_head=True)
 async def about_page_handler(request):
     """Serves the about page."""
-    # Local import to break circular dependency
     from utils import temp
     about_content = script.ABOUT_TXT.format(
         U_NAME=temp.U_NAME,
@@ -717,7 +714,6 @@ async def watch_page_handler(request: web.Request):
 
 @routes.get(r"/download/{path:\S+}", allow_head=True)
 async def download_page_handler(request: web.Request):
-    # Local import to break circular dependency
     from utils import get_size
     try:
         path = request.match_info["path"]
