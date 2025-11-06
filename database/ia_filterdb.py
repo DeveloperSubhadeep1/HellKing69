@@ -207,7 +207,9 @@ async def get_search_results(chat_id, query, file_type=None, max_results=None, o
         next_offset = offset + len(files) if has_next_page else ""
         total_results = offset + len(files) + (1 if has_next_page else 0)
     else:
-        count_tasks = [Media.count_documents(filter_mongo)]
+        # count_tasks = [Media.count_documents(filter_mongo)]
+
+        count_tasks = [await Media.count_documents(filter_mongo)]
         find_tasks = [Media.find(filter_mongo).sort("$natural", -1).skip(offset).limit(max_results).to_list(length=max_results)]
 
         if MULTIPLE_DB:
