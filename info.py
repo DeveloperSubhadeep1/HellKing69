@@ -429,6 +429,10 @@ LOG_STR += ("Spell Check Mode is enabled, bot will be suggesting related movies 
 SEND_ALL_MODE_PREMIUM_ONLY = bool(environ.get('SEND_ALL_MODE_PREMIUM_ONLY', True)) 
 # Add this line in info.py
 DAILY_FILE_LIMIT = int(environ.get('DAILY_FILE_LIMIT', 30)) # Set the daily file limit for non-premium users
+PUBLIC_FILE_STORE = is_enabled((environ.get('PUBLIC_FILE_STORE', "True")), True)
+FILE_STORE_CHANNEL = [int(ch) for ch in (environ.get('FILE_STORE_CHANNEL', '')).split()]
+
+
 
 
 
